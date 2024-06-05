@@ -1,27 +1,39 @@
 #include "Joc.h"
 
-Joc::Joc()//constructor JOC
+#include <cstdlib>
+
+
+Joc::Joc()
 {
-    J_tauler = Tauler();  //constructor Tractor
-    J_figura = Figura();  //constructor 
+    J_tauler.inicialitzarT();
+    J_figura.inicialitzarF();
 }
+
+
 
 void Joc::inicialitza(const string& nomFitxer)
 {
     Joc m_joc;  //creem una classe joc, que conte la classe tauler i figura aswell.
     //incicialitzem a 0  amb constructors  LOCURAAAA
 
-    ifstream fitxer;
-    fitxer.open(nomFitxer);  //obrim fitxer 
+    ifstream fitxer(nomFitxer);
 
+    J_tauler.inicialitzarT();
     int fila, col;        //   ·/\   /\·
-    Gir gir;             //    #'0'-'0'#      LibelUwUlaaaa!!!
-    TipusFigura tipus;
+    int gir;             //    #'0'-'0'#      LibelUwUlaaaa!!!
+    int tipus;
     fitxer >> tipus >> fila >> col >> gir;
-
+    if (tipus == 1 || tipus == 2)
+    {
+        col++;
+    }
+    if (tipus == 1)
+    {
+        fila--;
+    }
     J_figura.inicialitzarF(tipus, gir, fila, col);
 
-    ColorFigura color[MAX_FILA][MAX_COL];
+    int color[MAX_FILA][MAX_COL];
     for (int i = 0; i < MAX_FILA; i++)
     {
         for (int j = 0; j < MAX_COL; j++)
@@ -29,7 +41,8 @@ void Joc::inicialitza(const string& nomFitxer)
             fitxer >> color[i][j];
         }
     }
-    J_tauler.inicialitzarT(color[MAX_FILA][MAX_COL]);
+
+    J_tauler.inicialitzarT(color);
 
     figuraTauler();
 
@@ -38,158 +51,220 @@ void Joc::inicialitza(const string& nomFitxer)
 
 void Joc::figuraTauler()
 {
-    int fil = J_figura.getFila();
-    int col = J_figura.getColumna();
-
+    int fil = (J_figura.getFila());
+    int col = (J_figura.getColumna() + 1);
     int k = 0;
-    for (int i = fil - 1; i < fil + 2; i++)   //aixo esta fet nomes per DIM=3
+
+    for (int i = fil - 1; i <= fil + 2; i++)
     {
         int l = 0;
-        for (int j = col - 1; j < col + 2; j++)   //aixo esta fet nomes per DIM=3
+        for (int j = col - 2; j <= col + 1; j++)
         {
-            //J_tauler.tauler[i][j] = J_figura.figura[k][l]; La guardo per si...
-            J_tauler.setTauler(J_figura.getFigura(k, l), i, j);
+            if (J_tauler.getTauler(i, j) == COLOR_NEGRE)
+            {
+                J_tauler.setTauler(J_figura.getFigura(k, l), i, j);
+            }
+            l++;
+        }
+        k++;
+    }
+
+}
+
+void Joc::deleteFigura()
+{
+    int fil = (J_figura.getFila());
+    int col = (J_figura.getColumna() + 1);
+    int k = 0;
+
+    for (int i = fil - 1; i <= fil + 2; i++)
+    {
+        int l = 0;
+        for (int j = col - 2; j <= col + 1; j++)
+        {
+            if (J_tauler.getTauler(i, j) == J_figura.getFigura(k, l))
+            {
+                J_tauler.setTauler(COLOR_NEGRE, i, j);
+            }
             l++;
         }
         k++;
     }
 }
 
-
-bool Joc::giraFigura(DireccioGir direccio)
+bool Joc::potGirar(DireccioGir direccio)
 {
-
     if (direccio == GIR_HORARI)
         J_figura.girHorari();
     else
         J_figura.girAntiHorari();
 
-    bool trobat = 0;
-    int fila = J_figura.getFila();
-    int columna = J_figura.getColumna();
-    int i = fila - 1;
-    while (i < i + MAX_ALCADA && !trobat)  //aixo esta fet nomes per DIM=3
+    int fil = J_figura.getFila();
+    int col = (J_figura.getColumna() + 1);
+
+    bool trobat = 1;
+
+    int k = 0;
+    int i = fil - 1;
+    while (i <= fil + 2 && trobat)
     {
-        int j = columna - 1;
-        while (j < j + MAX_AMPLADA && !trobat)  //aixo esta fet nomes per DIM=3
+
+        int l = 0;
+        int j = col - 2;
+        while (j <= col + 1 && trobat)
         {
-            if (J_tauler.getTauler(i, j) != NO_COLOR && J_figura.getFigura(i, j) != NO_COLOR)
+            if (J_tauler.getTauler(i, j) != COLOR_NEGRE && J_figura.getFigura(k, l) != COLOR_NEGRE)
             {
-                trobat = 1;//lo que m'ha costat fer esta conclusió.
+                trobat = 0;//No pot girar
             }
             j++;
+            l++;
         }
         i++;
+        k++;
     }
-    if (trobat)
+    return trobat;
+}
+
+bool Joc::giraFigura(DireccioGir direccio)
+{
+    bool pot;
+    deleteFigura();
+    pot = potGirar(direccio);
+    if (!pot)
     {
         if (direccio == GIR_HORARI)
             J_figura.girAntiHorari();
         else
             J_figura.girHorari();
 
+        figuraTauler();
+        return 0;
+
+    }
+    else
+    {
+
+        figuraTauler();
+        return 1;
+    }
+
+}
+
+bool Joc::potMoure(int dirX)
+{
+    int fil = J_figura.getFila();
+    int col = (J_figura.getColumna() + 1);
+
+    bool trobat = 1;
+
+    int k = 0;
+    int i = fil - 1;
+    while (i <= fil + 2 && trobat)
+    {
+
+        int l = 0;
+        int j = col - 2;
+        while (j <= col + 1 && trobat)
+        {
+            if (J_tauler.getTauler(i, j + dirX) != COLOR_NEGRE && J_figura.getFigura(k, l) != COLOR_NEGRE)
+            {
+                trobat = 0;//lo que m'ha costat fer esta conclusió.
+            }
+            j++;
+            l++;
+        }
+        i++;
+        k++;
+    }
+    return trobat;
+}
+
+bool Joc::mouFigura(int dirX)
+{
+    deleteFigura();
+    if (!potMoure(dirX))
+    {
+        figuraTauler();
         return 0;
     }
     else
     {
+        J_figura.setColumna(J_figura.getColumna() + dirX);
         figuraTauler();
         return 1;
     }
 }
-bool Joc::mouFigura(int dirX)
-{
-    int canvi;
-    if (dirX == 1)
-        canvi = 1;
-    else
-        canvi = -1;
 
-    int fila = J_figura.getFila();
-    int columna = J_figura.getColumna();
-    bool trobat = 0;
-    int i = fila - 1;
-    while (i < i + MAX_ALCADA && !trobat)  //aixo esta fet nomes per DIM=3
+bool Joc::potBaixar()
+{
+    int fil = J_figura.getFila();
+    int col = (J_figura.getColumna() + 1);
+
+    bool trobat = 1;
+
+    int k = 0;
+    int i = fil - 1;
+    while (i <= fil + 2 && trobat)
     {
 
-        int j = columna - 1 + canvi;
-        while (j < j + MAX_AMPLADA && !trobat)  //aixo esta fet nomes per DIM=3
+        int l = 0;
+        int j = col - 2;
+        while (j <= col + 1 && trobat)
         {
-            if (J_tauler.getTauler(i, j) != NO_COLOR && J_figura.getFigura(i, j) != NO_COLOR)
+            if (J_tauler.getTauler(i + 1, j) != COLOR_NEGRE && J_figura.getFigura(k, l) != COLOR_NEGRE)
             {
-                trobat = 1;  //lo que m'ha costat fer esta conclusió.
+                trobat = 0;
             }
             j++;
+            l++;
         }
         i++;
+        k++;
     }
-    if (trobat)
-        return 0;
-    else
-    {
-        int canviarColumna;
-        canviarColumna = J_figura.getColumna();
-        canviarColumna = canviarColumna + canvi;
-        J_figura.setColumna(canviarColumna);
-
-        figuraTauler();
-        return 1;
-    }
+    return trobat;
 }
 
 int Joc::eliminarLinia()
 {
     int liniesEliminades = 0;
-    for (int i = 0; i < MAX_ALCADA; i++)
+    for (int i = 1; i < MAX_FILA; i++)
     {
-        int j = 0;
-        bool trobat = 0;
-        while (!trobat && j < MAX_AMPLADA)
+        int j = 1;
+        bool trobat = 1;
+        while (trobat && j <= MAX_COL)
         {
-            if (J_tauler.getTauler(i, j) == NO_COLOR)
+            if (J_tauler.getTauler(i, j) == COLOR_NEGRE)
             {
-                trobat = 1;
+                trobat = 0;
             }
-            else
                 j++;
         }
-        if (!trobat)
+
+        if (trobat)
         {
-            for (int k = i; k > 0; k++)
+            for (int k = i; k > 0; k--)
             {
-                for (int l = 0; l < MAX_AMPLADA; l++)
+                for (int l = 1; l <= MAX_COL; l++)
                 {
                     J_tauler.setTauler(J_tauler.getTauler(k - 1, l), k, l);
                 }
             }
-            liniesEliminades++;
-            for (int p = 0; p < MAX_AMPLADA; p++)
+            
+            for (int p = 1; p <= MAX_COL; p++)
             {
-                J_tauler.setTauler(NO_COLOR, 0, p);
+                J_tauler.setTauler(COLOR_NEGRE, 0, p);
             }
+            liniesEliminades++;
         }
     }
-    return liniesEliminades++;
+    return liniesEliminades;
 }
 
 int Joc::baixaFigura()
 {
-    bool trobat = 0;
-    int i = J_figura.getFila();
-    int columna = J_figura.getColumna();
-    while (i < i + MAX_ALCADA && !trobat)  //aixo esta fet nomes per DIM=3
-    {
-        int j = columna - 1;
-        while (j < j + MAX_AMPLADA && !trobat)  //aixo esta fet nomes per DIM=3
-        {
-            if (J_tauler.getTauler(i, j) != NO_COLOR && J_figura.getFigura(i, j) != NO_COLOR)
-            {
-                trobat = 1;//lo que m'ha costat fer esta conclusió.
-            }
-            j++;
-        }
-        i++;
-    }
-    if (trobat)
+    deleteFigura();
+    if (!potBaixar())
     {
         figuraTauler();
         int liniesEliminades = eliminarLinia();
@@ -197,24 +272,62 @@ int Joc::baixaFigura()
     }
     else
     {
-        int canviarFila;
-        canviarFila = J_figura.getFila();
-        canviarFila = canviarFila + 1;
-        J_figura.setFila(canviarFila);
-        return 0;
+        J_figura.setFila(J_figura.getFila() + 1);
+        figuraTauler();
+        return -1;
     }
 }
 
 void Joc::escriuTauler(const string& nomFitxer)
 {
-    figuraTauler();
     ofstream fitxer;
     fitxer.open(nomFitxer);
-    for (int i = 0; i < MAX_ALCADA; i++)
+    for (int i = 0; i < MAX_FILA; i++)
     {
-        for (int j = 0; j < MAX_AMPLADA; j++)
+        for (int j = 1; j < MAX_COL + 1; j++)
         {
             fitxer << J_tauler.getTauler(i, j) << " ";
+        }
+        cout << endl;
+    }
+    fitxer.close();
+
+    
+}
+
+bool Joc::jocAcabat()
+{
+    bool trobat = false;
+    if (J_figura.getFila() - 1 <= 0)
+    {
+        trobat = true;
+    }
+    return trobat;
+}
+
+void Joc::generarFigura()
+{
+    int numAleatori = rand() % 7 +1;
+    int girAleatori = (rand() % 4);
+    J_figura.inicialitzaF(numAleatori, girAleatori, 0,5 );
+}q
+
+void Joc::dibuixarJoc()
+{
+    for (int i = 0; i < MAX_FILA; i++)
+    {
+        for (int j = 1; j < MAX_COL + 1; j++)
+        {
+            switch (J_tauler.getTauler(i, j))
+            {
+            case 1: GraphicManager::getInstance()->drawSprite(GRAFIC_QUADRAT_GROC, POS_X_TAULER + (i * MIDA_QUADRAT), POS_Y_TAULER + (j * MIDA_QUADRAT), false);
+            case 2: GraphicManager::getInstance()->drawSprite(GRAFIC_QUADRAT_BLAUCEL, POS_X_TAULER + (i * MIDA_QUADRAT), POS_Y_TAULER + (j * MIDA_QUADRAT), false);
+            case 3: GraphicManager::getInstance()->drawSprite(GRAFIC_QUADRAT_MAGENTA, POS_X_TAULER + (i * MIDA_QUADRAT), POS_Y_TAULER + (j * MIDA_QUADRAT), false);
+            case 4: GraphicManager::getInstance()->drawSprite(GRAFIC_QUADRAT_TARRONGA, POS_X_TAULER + (i * MIDA_QUADRAT), POS_Y_TAULER + (j * MIDA_QUADRAT), false);
+            case 5: GraphicManager::getInstance()->drawSprite(GRAFIC_QUADRAT_BLAUFOSC, POS_X_TAULER + (i * MIDA_QUADRAT), POS_Y_TAULER + (j * MIDA_QUADRAT), false);
+            case 6: GraphicManager::getInstance()->drawSprite(GRAFIC_QUADRAT_VERMELL, POS_X_TAULER + (i * MIDA_QUADRAT), POS_Y_TAULER + (j * MIDA_QUADRAT), false);
+            case 7: GraphicManager::getInstance()->drawSprite(GRAFIC_QUADRAT_VERD, POS_X_TAULER + (i * MIDA_QUADRAT), POS_Y_TAULER + (j * MIDA_QUADRAT), false
+            }
         }
         cout << endl;
     }
