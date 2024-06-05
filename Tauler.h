@@ -11,13 +11,13 @@ public:
     //constructors
     Tauler();
     Tauler(ColorFigura taulerInicial[][MAX_COL]);
-    
+    void inicialitzarT(); //per a poder inicialitzar des de fora
     //geters i seters
-    void setTauler(ColorFigura color, int i, int j) {T_tauler[i][j]=color;}
-    ColorFigura getTauler(int i, int j) {return T_tauler[i][j];}
-    void inicialitzarT(ColorFigura color[MAX_FILA][MAX_COL]);
-    
+    void setTauler(ColorFigura color, int i, int j) { T_tauler[i][j] = color; }
+    ColorFigura getTauler(int i, int j) { return T_tauler[i][j]; }
+    void inicialitzarT(int color[MAX_FILA][MAX_COL]);
+
 private:
-    ColorFigura T_tauler[MAX_FILA][MAX_COL];
+    ColorFigura T_tauler[MAX_FILA + 2][MAX_COL + 1];
 };
 #endif
