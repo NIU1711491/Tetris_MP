@@ -13,7 +13,7 @@ typedef enum
     COLOR_TARONJA,
     COLOR_BLAUFOSC,
     COLOR_VERMELL,
-    COLOR_VERD,
+    COLOR_VERD, 
     NO_COLOR
 } ColorFigura;
 
@@ -53,18 +53,16 @@ public:
     //constructors:
     Figura();
     Figura(TipusFigura tipus, Gir gir, int fila, int columna);
-    void inicialitzarF(TipusFigura tipus, Gir gir, int fila, int col);
-
+    void inicialitzarF(int tipus, int gir, int fila, int col);
+    void inicialitzarF();
 
     //seters i geters:
     void setTipus(TipusFigura tipus) { F_TipusFigura = tipus; }
-    void setGir(Gir gir) { F_Gir = gir; }
     void setFigura(ColorFigura color, int i, int j) { F_Figura[i][j] = color; }
     void setFila(int fila) { F_Fila = fila; }
     void setColumna(int columna) { F_Columna = columna; }
 
     TipusFigura getTipus() { return F_TipusFigura; }
-    Gir getGir() { return F_Gir; }
     ColorFigura getFigura(int i, int j) { return F_Figura[i][j]; }
     int getFila() { return F_Fila; }
     int getColumna() { return F_Columna; }
@@ -74,12 +72,9 @@ public:
     void girAntiHorari();
 private:
     TipusFigura F_TipusFigura;
-    Gir F_Gir;
     ColorFigura F_Figura[MAX_ALCADA][MAX_AMPLADA];
     int F_Fila;
     int F_Columna;
-    int F_Alcada;
-    int F_Amplada;
 };
 
 
