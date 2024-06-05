@@ -1,90 +1,266 @@
+
 #include "Figura.h"
 
-Figura::Figura()  //constructor per inicialitzar tot a 0 literal
+Figura::Figura() //constructor per defecte de Figura pq sinó Joc.cpp peta
 {
     F_TipusFigura = NO_FIGURA;
-    F_Gir = NO_GIR;
-    F_Figura[MAX_ALCADA][MAX_AMPLADA] = { NO_COLOR };
+
+    for (int i = 0; i < MAX_ALCADA - 2; i++)
+    {
+        for (int j = 0; j < MAX_AMPLADA - 2; j++)
+        {
+            F_Figura[i][j] = COLOR_NEGRE;
+        }
+    }
+
     F_Fila = 0;
     F_Columna = 0;
 }
+void Figura::inicialitzarF() // per a poder cridar al constructor des de fora
+{
+    Figura();
+}
+
 
 Figura::Figura(TipusFigura tipus, Gir gir, int fila, int columna)
 //constructor per inicialitzar amb el que es pasa per parametres
 {
     F_TipusFigura = tipus;
-    F_Gir = gir;
     F_Fila = fila;
     F_Columna = columna;
-
-    switch (F_TipusFigura)   //AIXO ESTA MALAMENT PQ NO PUC RESTAR A UNA VARIABLE CONST: MAX_ALCADA, MAX_AMPLADA
+    for (int i = 0; i < MAX_ALCADA; i++)
     {
-    case FIGURA_O: F_Figura[MAX_ALCADA][MAX_AMPLADA] = { COLOR_GROC }; ; break;
-    case FIGURA_I: F_Figura[MAX_ALCADA][MAX_AMPLADA] = { {NO_COLOR, NO_COLOR, NO_COLOR, NO_COLOR},{COLOR_BLAUCEL, COLOR_BLAUCEL, COLOR_BLAUCEL, COLOR_BLAUCEL},{NO_COLOR, NO_COLOR, NO_COLOR, NO_COLOR},{NO_COLOR, NO_COLOR, NO_COLOR, NO_COLOR} }; break;
-    case FIGURA_T: F_Figura[MAX_ALCADA - 1][MAX_AMPLADA - 1] = { {NO_COLOR, COLOR_MAGENTA, NO_COLOR},{COLOR_MAGENTA, COLOR_MAGENTA, COLOR_MAGENTA},{NO_COLOR, NO_COLOR, NO_COLOR} }; break;
-    case FIGURA_L: F_Figura[MAX_ALCADA - 1][MAX_AMPLADA - 1] = { {NO_COLOR, NO_COLOR, COLOR_TARONJA},{COLOR_TARONJA, COLOR_TARONJA, COLOR_TARONJA},{NO_COLOR, NO_COLOR, NO_COLOR} }; break;
-    case FIGURA_J: F_Figura[MAX_ALCADA - 1][MAX_AMPLADA - 1] = { {COLOR_BLAUFOSC, NO_COLOR, NO_COLOR},{COLOR_BLAUFOSC, COLOR_BLAUFOSC, COLOR_BLAUFOSC},{NO_COLOR, NO_COLOR, NO_COLOR} }; break;
-    case FIGURA_Z: F_Figura[MAX_ALCADA - 1][MAX_AMPLADA - 1] = { {COLOR_VERMELL, COLOR_VERMELL, NO_COLOR},{NO_COLOR, COLOR_VERMELL, COLOR_VERMELL},{NO_COLOR, NO_COLOR, NO_COLOR} }; break;
-    case FIGURA_S: F_Figura[MAX_ALCADA - 1][MAX_AMPLADA - 1] = { {NO_COLOR, COLOR_VERD, COLOR_VERD},{COLOR_VERD, COLOR_VERD, NO_COLOR},{NO_COLOR, NO_COLOR, NO_COLOR} }; break;
+        for (int j = 0; j < MAX_AMPLADA; j++)
+        {
+            F_Figura[i][j] = COLOR_NEGRE;
+        }
+    }
+}
+
+void Figura::inicialitzarF(int tipus, int gir, int fila, int col)
+{
+    for (int i = 0; i < MAX_ALCADA; i++)
+    {
+        for (int j = 0; j < MAX_AMPLADA; j++)
+        {
+            F_Figura[i][j] = COLOR_NEGRE;
+        }
+    }
+    Figura();
+    F_Fila = fila;
+    F_Columna = col;
+    switch (tipus)
+    {
+    case 1: F_TipusFigura = FIGURA_O; break;
+    case 2: F_TipusFigura = FIGURA_I; break;
+    case 3: F_TipusFigura = FIGURA_T; break;
+    case 4: F_TipusFigura = FIGURA_L; break;
+    case 5: F_TipusFigura = FIGURA_J; break;
+    case 6: F_TipusFigura = FIGURA_Z; break;
+    case 7: F_TipusFigura = FIGURA_S; break;
+    default: F_TipusFigura = NO_FIGURA; break;
     }
 
-    for (int i = 0; i < F_Gir; i++)
+    switch (F_TipusFigura)
+    {
+    case FIGURA_O:
+        for (int i = 1; i < MAX_ALCADA - 1; i++)
+        {
+            for (int j = 1; j < MAX_AMPLADA - 1; j++)
+            {
+                F_Figura[i][j] = COLOR_GROC;
+            }
+        }
+        break;
+    case FIGURA_I:
+        for (int i = 0; i < MAX_ALCADA; i++)
+        {
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                if (i == 1)
+                {
+                    F_Figura[i][j] = COLOR_BLAUCEL;
+                }
+                else
+                    F_Figura[i][j] = COLOR_NEGRE;
+            }
+        }
+        break;
+
+    case FIGURA_T:
+        for (int i = 0; i < MAX_ALCADA; i++)
+        {
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                if ((i == 1 && j > 0) || (i == 0 && j == 2))
+                {
+                    F_Figura[i][j] = COLOR_MAGENTA;
+                }
+                else
+                    F_Figura[i][j] = COLOR_NEGRE;
+            }
+        }
+        break;
+    case FIGURA_L:
+        for (int i = 0; i < MAX_ALCADA; i++)
+        {
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                if ((i == 1 && j > 0) || (i == 0 && j == 3))
+                {
+                    F_Figura[i][j] = COLOR_TARONJA;
+                }
+                else
+                    F_Figura[i][j] = COLOR_NEGRE;
+            }
+        }
+        break;
+    case FIGURA_J:
+        for (int i = 0; i < MAX_ALCADA; i++)
+        {
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                if ((i == 1 && j > 0) || (i == 0 && j == 1))
+                {
+                    F_Figura[i][j] = COLOR_BLAUFOSC;
+                }
+                else
+                    F_Figura[i][j] = COLOR_NEGRE;
+            }
+        }
+        break;
+    case FIGURA_Z:
+        for (int i = 0; i < MAX_ALCADA; i++)
+        {
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                if ((i == 1 && j > 1) || (i == 0 && j != 3 && j != 0))
+                {
+                    F_Figura[i][j] = COLOR_VERMELL;
+                }
+                else
+                    F_Figura[i][j] = COLOR_NEGRE;
+            }
+        }
+        break;
+    case FIGURA_S:
+        for (int i = 0; i < MAX_ALCADA; i++)
+        {
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                if ((i == 1 && j != 3 && j != 0) || (i == 0 && j > 1))
+                {
+                    F_Figura[i][j] = COLOR_VERD;
+                }
+                else
+                    F_Figura[i][j] = COLOR_NEGRE;
+            }
+        }
+        break;
+    }
+
+
+    for (int i = 0; i < gir; i++)
     {
         girHorari();
     }
 }
 
-void Figura::inicialitzarF(TipusFigura tipus, Gir gir, int fila, int col)
-{
-    Figura(tipus, gir, fila, col);
-}
-
 void Figura::girHorari()
 {
     ColorFigura temporal[MAX_ALCADA][MAX_AMPLADA]{};
-
-    int l = 0;
-    for (int i = 0; i < MAX_ALCADA; i++)
+    if (F_TipusFigura == FIGURA_I || F_TipusFigura == FIGURA_O)
     {
-        int k = MAX_ALCADA - 1;
-        for (int j = 0; j < MAX_AMPLADA; j++)
+        int l = 0;
+        for (int i = 0; i < MAX_ALCADA; i++)
         {
-            temporal[i][j] = F_Figura[k][l];
-            k--;
+            int k = 3;
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                temporal[i][j] = F_Figura[k][l];
+                k--;
+            }
+            l++;
         }
-        l++;
+        for (int i = 0; i < MAX_ALCADA; i++)
+        {
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                F_Figura[i][j] = temporal[i][j];
+            }
+        }
     }
-
-    for (int i = 0; i < MAX_ALCADA; i++)
+    else
     {
-        for (int j = 0; j < MAX_AMPLADA; j++)
+        int l = 1;
+        for (int i = 0; i < MAX_ALCADA - 1; i++)
         {
-            F_Figura[i][j] = temporal[i][j];
+            int k = 2;
+            for (int j = 1; j < MAX_AMPLADA; j++)
+            {
+                temporal[i][j] = F_Figura[k][l];
+                k--;
+            }
+            l++;
         }
+
+        for (int i = 0; i < MAX_ALCADA - 1; i++)
+        {
+            for (int j = 1; j < MAX_AMPLADA; j++)
+            {
+                F_Figura[i][j] = temporal[i][j];
+            }
+        }
+
+
     }
 }
 
 void Figura::girAntiHorari()
 {
-    ColorFigura temporal[MAX_ALCADA][MAX_AMPLADA];
-
-    int l = MAX_AMPLADA - 1;
-    for (int i = 0; i < MAX_ALCADA; i++)
+    ColorFigura temporal[MAX_ALCADA][MAX_AMPLADA]{};
+    if (F_TipusFigura == FIGURA_I || F_TipusFigura == FIGURA_O)
     {
-        int k = 0;
-        for (int j = 0; j < MAX_AMPLADA; j++)
+        int l = 3;
+        for (int i = 0; i < MAX_ALCADA; i++)
         {
-            temporal[i][j] = F_Figura[k][l];
-            k++;
+            int k = 0;
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                temporal[i][j] = F_Figura[k][l];
+                k++;
+            }
+            l--;
         }
-        l--;
+        for (int i = 0; i < MAX_ALCADA; i++)
+        {
+            for (int j = 0; j < MAX_AMPLADA; j++)
+            {
+                F_Figura[i][j] = temporal[i][j];
+            }
+        }
+    }
+    else
+    {
+        int l = 3;
+        for (int i = 0; i < MAX_ALCADA - 1; i++)
+        {
+            int k = 0;
+            for (int j = 1; j < MAX_AMPLADA; j++)
+            {
+                temporal[i][j] = F_Figura[k][l];
+                k++;
+            }
+            l--;
+        }
+
+        for (int i = 0; i < MAX_ALCADA - 1; i++)
+        {
+            for (int j = 1; j < MAX_AMPLADA; j++)
+            {
+                F_Figura[i][j] = temporal[i][j];
+            }
+        }
     }
 
-    for (int i = 0; i < MAX_ALCADA; i++)
-    {
-        for (int j = 0; j < MAX_AMPLADA; j++)
-        {
-            F_Figura[i][j] = temporal[i][j];
-        }
-    }
 }
